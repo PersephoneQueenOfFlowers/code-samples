@@ -1,0 +1,62 @@
+import React, { useState }  from "react";
+import "./style.css";
+import API from "./api";
+
+const App = () => {
+
+  const [rider, riderChange] = useState("");
+
+   const getDriverEmails =  async (data) => {
+     const driversEmails = [];
+
+     for(let i = 0; i < data.length; i++){
+       
+       let driverEmail = await API.fetchDriver(data[i].driverUUID);
+
+       driversEmails.push(driverEmail.email);
+       
+     }
+      return driversEmails;
+   }
+
+  const onInputChange = event => {
+    event.preventDefault();
+    riderChange(event.target.value); 
+  }
+
+  const onSubmit = event => {
+    event.preventDefault();
+    let recentEmails = API.fetchRecentTripsForRider(rider)
+    .then((data) => {
+      if(data.err){
+        console.log(err);
+      }    
+      getDriverEmails(data);
+    });
+  }
+
+  return (
+    <div className="App">
+      <form id="form">
+        <label>
+          Rider UUID:
+          value={}
+          <input 
+            type="text" 
+            id="text" 
+            value={rider} 
+            onChange={(e)=> onInputChange(e)}  
+          />
+        </label>
+        <input 
+          type="submit" 
+          value="Fetch driver emails"  
+          onClick={(e)=> onSubmit(e)}
+        />
+        <div id="results" />
+      </form>
+    </div>
+  );
+};
+
+export default App;
